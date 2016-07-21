@@ -3,7 +3,7 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 body > h1 {
-    color: #F6F6FA;
+    color: #07081C;
     text-align: center;
     margin-top: 20%;
 }
@@ -17,18 +17,27 @@ img {
   left: 50%;
   transform: translate(-50%, -50%);
 }
-div {
+.intro-overlay {
     background-color: #07081C;
     height: 100vh;
     width: 100%;
+    position: relative;
+    z-index: 5000;
 }
-ul {
+.main {
+    background-color: #FFFFFF;
+    height: 400vh;
+    width: 100vh;
+}
+.nav {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    border: 1px solid #e7e7e7;
-    background-color: #f3f3f3;
+    background-color: #07081C;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
 }
 
 li {
@@ -49,5 +58,6 @@ li a:hover:not(.active) {
 
 li a.active {
     color: white;
-    background-color: #4CAF50;
+    background-color: #FF7A15;
+    5CCC5C or indianred
 }
