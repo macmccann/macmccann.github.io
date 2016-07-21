@@ -1,0 +1,24 @@
+body {
+
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+body > h1 {
+    color: #F6F6FA;
+    text-align: center;
+    margin-top: 20%;
+}
+p {
+    color: #07081C;
+    text-align: center;
+}
+img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+div {
+    background-color: #07081C;
+    height: 100vh;
+    width: 100%;
+}
