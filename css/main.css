@@ -3,12 +3,12 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 body > h1 {
-    color: #07081C;
+    color: #01777A;
     text-align: center;
     margin-top: 20%;
 }
 p {
-    color: #07081C;
+    color: #01777A;
     text-align: center;
 }
 img {
@@ -18,14 +18,14 @@ img {
   transform: translate(-50%, -50%);
 }
 .intro-overlay {
-    background-color: #07081C;
+    background-color: #01777A;
     height: 100vh;
     width: 100%;
     position: relative;
     z-index: 5000;
 }
 .main {
-    background-color: #FFFFFF;
+    background-color: #F6F6FA;
     height: 400vh;
     width: 100vh;
 }
@@ -39,7 +39,7 @@ img {
     margin-right: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #07081C;
+    background-color: #01777A;
     width: 100%;
     z-index: 1000;
 }
@@ -55,18 +55,19 @@ li {
 
 li a {
     display: block;
-    color: #666;
+    color: #F6F6FA;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
 }
 
 li a:hover:not(.active) {
+    color: #07081C;
     background-color: #ddd;
 }
 
 li a.active {
-    color: white;
-    background-color: #FF7A15;
+    color: #F6F6FA;
+    background-color: #1C1D39;
     5CCC5C or indianred
 }
