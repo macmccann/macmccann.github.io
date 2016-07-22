@@ -3,12 +3,12 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 body > h1 {
-    color: #01777A;
+    color: #07081C;
     text-align: center;
     margin-top: 20%;
 }
 p {
-    color: #01777A;
+    color: #07081C;
     text-align: center;
 }
 img {
@@ -18,7 +18,7 @@ img {
   transform: translate(-50%, -50%);
 }
 .intro-overlay {
-    background-color: #01777A;
+    background-color: #07081C;
     height: 100vh;
     width: 100%;
     position: relative;
@@ -39,7 +39,7 @@ img {
     margin-right: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #01777A;
+    background-color: #07081C;
     width: 100%;
     z-index: 1000;
 }
@@ -63,11 +63,16 @@ li a {
 
 li a:hover:not(.active) {
     color: #07081C;
-    background-color: #ddd;
+    background-color: #B3B3C7;
 }
 
 li a.active {
-    color: #F6F6FA;
-    background-color: #1C1D39;
+    color: #07081C;
+    background-color: #DEA937;
     5CCC5C or indianred
 }
+
+hows this for a color scheme:
+    07081C
+    37939E
+    DDB770
