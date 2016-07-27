@@ -1,6 +1,6 @@
 body {
 
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Georgia, Times, "Times New Roman", serif;
 }
 body > h1 {
     color: #07081C;
@@ -27,16 +27,18 @@ img {
 .main {
     background-color: #F6F6FA;
     height: 400vh;
-    width: 100vh;
+    width: 100vw;
+    display: inline-block;
+    top: 100vh;
+    margin-top: 46px;
 }
 
 .nav {
     position: absolute;
 
     list-style-type: none;
-    margin-top: 100vh;
-    margin-left: 0;
-    margin-right: 0;
+    top: 100vh;
+    margin: 0 0 0 0;
     padding: 0;
     overflow: hidden;
     background-color: #07081C;
@@ -46,7 +48,7 @@ img {
 
 .fix-search  {
     position: fixed;
-    margin-top: 0;
+    top: 0;
 }
 
 li {
@@ -71,8 +73,11 @@ li a.active {
     background-color: #DEA937;
     5CCC5C or indianred
 }
+<<<<<<< HEAD
 
 hows this for a color scheme:
     07081C
     37939E
     DDB770
+=======
+>>>>>>> refs/remotes/origin/master
