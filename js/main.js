@@ -4,6 +4,8 @@ $(document).ready(function() {
     var nav = $(".nav");
     var scrollTop = $(window).scrollTop();
     var windowHeight = $(window).height();
+    var maclogo = document.getElementById("maclogo");
+    var scrollButton = document.getElementById("scrollbutton");
     document.addEventListener("scroll", function(){
         scrollTop = $(window).scrollTop();
         var windowHeight = $(window).height();
@@ -11,10 +13,13 @@ $(document).ready(function() {
             nav.addClass("fix-nav");
         } else {
             nav.removeClass("fix-nav");
+            
+            
+            
         }
     });
     
-    var scrollButton = document.getElementById("scrollbutton");
+    
     scrollButton.addEventListener("click", function(){
         var body=$("html, body");
         body.animate({scrollTop:$(window).height()},'500','swing');
