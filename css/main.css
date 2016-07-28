@@ -1,5 +1,6 @@
 body {
-
+    margin: 0;
+    padding: 0;
     font-family: Georgia, Times, "Times New Roman", serif;
 }
 body > h1 {
@@ -7,14 +8,16 @@ body > h1 {
     text-align: center;
     margin-top: 20%;
 }
+
 p {
     color: #07081C;
     text-align: center;
 }
-img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+.maclogo {
+  position: fixed;
+  z-index: 100;
+  top: 50vh;
+  left: 50vw;
   transform: translate(-50%, -50%);
 }
 .intro-overlay {
@@ -22,12 +25,14 @@ img {
     height: 100vh;
     width: 100%;
     position: relative;
-    z-index: 5000;
+    z-index: 1;
 }
 .main {
+    position: absolute;
+    z-index: 999;
     background-color: #F6F6FA;
     height: 400vh;
-    width: 100vw;
+    width: 100%;
     display: inline-block;
     top: 100vh;
     margin-top: 46px;
@@ -46,7 +51,7 @@ img {
     z-index: 1000;
 }
 
-.fix-search  {
+.fix-nav  {
     position: fixed;
     top: 0;
 }
@@ -72,6 +77,44 @@ li a.active {
     color: #07081C;
     background-color: #DEA937;
     5CCC5C or indianred
+}
+.fa-chevron-circle-down{
+    position: fixed;
+    z-index: 100;
+    color: #F6F6FA; 
+    top: 80vh; 
+    left: 50vw;
+    cursor: pointer;
+    transform: translate(-50%, 0%);
+    -webkit-transition: .25s ease-in-out;
+    -moz-transition: .25s ease-in-out;
+    -o-transition: .25s ease-in-out;
+    transition: .25s ease-in-out;
+}
+.fa-chevron-circle-down:hover{
+    -webkit-transition: .25s ease-in-out;
+    -moz-transition: .25s ease-in-out;
+    -o-transition: .25s ease-in-out;
+    transition: .25s ease-in-out;
+    -webkit-transform: translate(0, 10px);
+    -moz-transform: translate(3em,0);
+    -o-transform: translate(3em,0);
+    -ms-transform: translate(3em,0);
+    transform: translate(-50%, 10px);
+}
+
+.no-startup-animations{
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+
+.fixed{
+    position: fixed;
+}
+.under{
+    z-index: 2000;
 }
 <<<<<<< HEAD
 
