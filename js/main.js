@@ -27,4 +27,5 @@ $(document).ready(function() {
     scrollButton.addEventListener("mouseover", function(){
         $(scrollButton).removeClass("no-startup-animations");
     });
+    
 });

@@ -1,17 +1,55 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: Georgia, Times, "Times New Roman", serif;
+    font-family: TiemposHeadline-Semibold,Georgia,Times,"Times New Roman",serif;
 }
 body > h1 {
     color: #07081C;
     text-align: center;
     margin-top: 20%;
+    
+    font-size: 100px;
 }
-
+h1 {
+    text-align: center; 
+    font-size: 54px; 
+    font-weight: normal
+}
+.wrapper{
+    padding-top: 30px;
+    padding-bottom: 15px;
+    max-width: 72rem;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+hr {
+    width: 66%; margin-bottom: 20px;
+}
+.column-thirds-1{
+    float: left;
+    width: 33%;
+    margin-top: 30px;
+}
+.column-thirds-2{
+    float: left;
+    width: 33%;
+    margin-top: 30px;
+}
+.column-thirds-3{
+    float: left;
+    width: 33%;
+    margin-top: 30px;
+}
 p {
-    color: #07081C;
-    text-align: center;
+    padding: 0 20px;
+}
+.mac-img-circle{
+    border-radius: 50%;
+    border: 10px solid #bbe3e5;
+    width: 75%;
+    margin-left: 50%;
+    transform: translate(-50%, 0);
+    
 }
 .maclogo {
   position: fixed;
@@ -31,9 +69,8 @@ p {
     position: absolute;
     z-index: 999;
     background-color: #F6F6FA;
-    height: 400vh;
     width: 100%;
-    display: inline-block;
+    display: inline;
     top: 100vh;
     margin-top: 46px;
 }
@@ -55,6 +92,9 @@ p {
     position: fixed;
     top: 0;
 }
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
 
 li {
     float: left;
