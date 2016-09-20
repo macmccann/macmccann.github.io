@@ -6,7 +6,6 @@ body {
 body > h1 {
     color: #07081C;
     text-align: center;
-    margin-top: 20%;
     
     font-size: 100px;
 }
@@ -21,12 +20,26 @@ body > h1 {
     font-size: 1.5rem;
     margin: 0 0 40px 0;
 }
+.projects {
+    overflow: visible;
+    border: 1px solid #07081C;
+}
+.projects > h1 {
+    font-family: Calibre-Regular,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    letter-spacing: -2px;
+    width: 29rem;
+    text-align: center;
+    margin-left: 50%;
+    transform: translate(-50%, 0);
+    background-color: #F6F6FA;  
+    margin-top: -50px;
+}
 .wrapper{
     padding-top: 30px;
     padding-bottom: 15px;
     max-width: 80%;
-    box-sizing: border-box;
     margin: 0 auto;
+    overflow: hidden;
 }
 hr {
     width: 66%; margin-bottom: 20px;
@@ -82,7 +95,6 @@ p {
     z-index: 999;
     background-color: #F6F6FA;
     width: 100%;
-    display: inline;
     top: 100vh;
     margin-top: 46px;
 }
@@ -177,16 +189,15 @@ li a.active {
     z-index: 9000;
     
 }
-
 .colorbar-blue{
-    width: 50.55%;
+    width: 50%;
     height: .6rem;
     background-color: #00A8B4;   
     
 }
 .colorbar-green{
-    width: 24.45%;
-    margin-left: 50.55%;
+    width: 25.5%;
+    margin-left: 50%;
     margin-top: -.6rem;
     height: .6rem;
     background-color: #5CCC5C;  
@@ -205,14 +216,22 @@ li a.active {
     height: .6rem;
     background-color: #CD5C5C;
 }
-hows this for a color scheme:
-    07081C
-    37939E
-    DDB770
 
-
-more colors for the colorbar:
-    00A8B4
-    5CCC5C
-    DEA937
-    CD5C5C
+.footer{
+    width: 100%;
+    margin-top: 20px;
+    background-color: #07081C;
+    z-index: 1000;
+    display: block;
+    overflow: hidden;
+}
+.footer-production{
+    position: relative;
+    left: 31%;
+    top: 30px;
+}
+.footer-contact{
+    position: relative;
+    left: 51%;
+    top: -19px;
+}
