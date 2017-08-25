@@ -5,9 +5,6 @@ and when finished it should contain:
 
  - my resume/projects
  - a contact page
- - a music blog
- - a coding blog
- - a blog about mobile apps
 
 If you'd like to get in touch with me, feel free to email me at johnwilfredmccann@gmail.com.
 
