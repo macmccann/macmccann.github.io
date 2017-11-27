@@ -12,6 +12,8 @@ body {
     height: 100%;
     min-height: 100%;
     text-align: center;
+    font-family: 'Filmotype Fashion';
+    background-color: rgb(246, 246, 250);
 }
 
 code {
@@ -27,4 +29,10 @@ a {
     width: 50%;
     height: auto;
     margin: 0 auto;
+}
+
+.main-header {
+    font-family: "Sofia W01 Light1446819","Helvetica Neue",Helvetica,Arial,sans-serif;
+    margin-top: 5vh;
+    margin-bottom: 5vh;
 }
