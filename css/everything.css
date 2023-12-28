@@ -17,7 +17,7 @@ body {
 }
 
 code {
-    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+    font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 }
 
 a {
@@ -39,4 +39,54 @@ a {
 .main-header {
     margin-top: 10vh;
     margin-bottom: 5vh;
+}
+
+:root {
+    --piano-theme-color-dark: #e87b95;
+    --piano-theme-color-light: #ffd6e1;
+    --drums-theme-color-dark: #9993bf;
+    --drums-theme-color-light: #d5cffa;
+    --synth-theme-color-dark: #41E66A;
+    --synth-theme-color-light: #dff5e4;
+    --bass-theme-color-dark: #5688C7;
+    --bass-theme-color-light: #ceddf0;
+    --drums-piano-guide-width-px: 80px;
+}
+
+@keyframes bounce {
+
+    0% {
+        background-color: white;
+    }
+
+    20% {
+        background-color: var(--piano-theme-color-light);
+    }
+
+    40% {
+        background-color: var(--drums-theme-color-light);
+    }
+
+    60% {
+        background-color: var(--synth-theme-color-light);
+
+    }
+
+    80% {
+        background-color: var(--bass-theme-color-light);
+    }
+}
+
+#bars {
+    margin-top: 2.5rem;
+    color: black;
+}
+
+#bars>a {
+    color: black;
+    animation: bounce 10s linear infinite;
+    text-decoration: none;
+    border: 1px solid black;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
 }
