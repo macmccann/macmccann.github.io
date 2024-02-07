@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link href="css/everything.css" rel="stylesheet">
+    <link href="css/music_practice.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+
+    <title>Music Practice</title>
+</head>
+
+<body>
+    <div class="main-container">
+        <h1 class="main-header">Music Practice</h1>
+        <h2 id="note" class="note">C</h2>
+    </div>
+    <div class="modifiers">
+        <h2 id="notes-type" class="notes-type"></h2>
+        <h2 id="string-range" class="string-range"></h2>
+        <h2 id="fret-range" class="fret-range"></h2>
+    </div>
+
+    <div class="options">
+        <div class="option">
+            <h2>Scales</h2>
+            <div class="checkOption">
+                <input type="checkbox" id="majorScale" name="majorScale" value="major"><label
+                    for="majorScale">Major</label>
+            </div>
+            <div class="checkOption">
+                <input type="checkbox" id="minorScale" name="minorScale" value="minor"><label
+                    for="minorScale">Minor</label>
+            </div>
+            <div class="checkOption">
+                <input type="checkbox" id="majorPentatonic" name="majorPentatonic" value="majorPentatonic"><label
+                    for="majorPentatonic">Major pentatonic</label>
+            </div>
+            <div class="checkOption">
+                <input type="checkbox" id="minorPentatonic" name="minorPentatonic" value="minorPentatonic"><label
+                    for="minorPentatonic">Minor pentatonic</label>
+            </div>
+        </div>
+
+        <div class="option">
+            <h2>Chords</h2>
+            <div class="checkOption">
+                <input type="checkbox" id="majorChord" name="majorChord" value="major"><label
+                    for="majorChord">Major</label>
+            </div>
+            <div class="checkOption">
+                <input type="checkbox" id="minorChord" name="minorChord" value="minor"><label
+                    for="minorChord">Minor</label>
+            </div>
+        </div>
+
+        <div class="option">
+            <h2>String ranges</h2>
+            <div class="checkOption">
+                <input type="checkbox" id="stringRanges" name="stringRanges" value="stringRanges"><label
+                    for="stringRanges">Use string ranges</label>
+            </div>
+            <p class="descriptor">Will pick a random group of strings. Options are 1-3 or 4-6.</p>
+        </div>
+
+        <div class="option">
+            <h2>Fret ranges</h2>
+            <div class="checkOption">
+                <input type="checkbox" id="fretRanges" name="fretRanges" value="fretRanges"><label for="fretRanges">Use
+                    fret ranges</label>
+            </div>
+            <p class="descriptor">Will pick a random group of 4 frets. Options range from 0-3 to 9-12.</p>
+        </div>
+
+        <div class="option">
+            <h2>Auto</h2>
+            <div class="checkOption">
+                <input type="checkbox" id="auto" name="auto" value="auto"><label for="auto">Auto</label>
+            </div>
+            <div class="bpm">
+                <input aria-valuemax="200" aria-valuemin="20" type="number" id="bpm" name="bpm" value="bpm"><label
+                    for="bpm">BPM</label>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+<script src="js/music_practice.js"></script>
+
+</html>

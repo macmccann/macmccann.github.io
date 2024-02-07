@@ -1,0 +1,42 @@
+.note {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    border: 1px solid black;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 80px;
+    font-size: 60px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.options {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.option {
+    flex-direction: column;
+    display: flex;
+    max-width: 200px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.checkOption {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.descriptor {
+    color: #000000;
+    font-size: 12px;
+}
+
+body {
+    user-select: none;
+}
