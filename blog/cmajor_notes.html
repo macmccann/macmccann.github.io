@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - CMajor Notes</title>
+    <link rel="stylesheet" href="../css/everything.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            overflow-y: scroll;
+        }
+
+        li {
+            margin-bottom: 1rem;
+        }
+
+        code {
+            background-color: #b0b0b0;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+</head>
+
+<body>
+    <h1>CMajor Day 1 Notes</h1>
+    <p>
+        I wanted to take some notes on my impression of the first few hours working in the <a
+            href="https://cmajor.dev/">CMajor</a> language.
+    </p>
+    <div style="text-align: left; margin-left: 5rem; margin-right: 5rem; margin-bottom: 2rem;">
+        <ul>
+            <li>.cmajorpatch and .cmajor are pretty long file extensions compared to others people will be more familiar
+                with like
+                TODO</li>
+
+            <li>It would be nice to have command line tools on homebrew. Maybe later on.</li>
+
+            <li>Hello world is truly super easy! I think I got set up in under 15 minutes to the "AnnoyingBeep" hello
+                world.
+            </li>
+
+            <li>If you try to test your patch out by naively using the wasm generator, you might get a cors error when
+                just
+                navigating in your browser to something like
+                <code>file:///~/cmajor_test/helloworld/helloworld/index.html</code> -
+                this
+                is
+                easily fixed by running npx
+                http-server (or
+                some other static file server) but new devs coming from a music background may not know how to view the
+                browser dev tools or decipher the chrome error.
+            </li>
+
+            <li>
+                Interesting that the root-level entities can be either a graph or a processor.
+            </li>
+
+            <li>
+                There's something pretty magical about modifying audio code with the hot reloading! I never expected it
+                to be so easy.
+            </li>
+
+            <li>
+                First-class support for complex numbers is awesome. Not sure if this is a concept from other C-like
+                languages.
+            </li>
+
+            <li>
+                First class limited range integer types is great - it would be nice to have some kind of type
+                that
+                throws for out of bounds in development mode, but acts like wrap or clamp in production mode.
+            </li>
+
+            <li>
+                Array indexing runtime warnings for perf reasons makes a ton of sense.
+            </li>
+
+            <li>
+                Arrays returning a copy by default when slicing seems weird for perf reasons but reasonable for safety
+                reasons. I saw there was also an alternative to this, fdsa;
+            </li>
+
+            <li>
+                Are graphs just a restricted subset of processors?
+            </li>
+
+            <li>
+                Streaming
+                <code>out <- volume * sin (phase);</code> and then calling advance();
+                seems
+                weird but I'm sure it'll make sense if I
+                use the language more. I wonder what happens if you stream out multiple times before calling
+                advance();
+            </li>
+
+            <li>
+                I wish the examples used more of the
+                standard library, especially the oscillators. I had a hard time writing oscillators with no examples. I
+                think this was my biggest 'long-term' complaint - you'll see in the code later on that I just ended up
+                hacking together my own saw wave.
+            </li>
+
+            <li>
+                Coming from JS, i had expected 'let' to create a mutable variable so I was confused by the error it
+                bubbled up.
+            </li>
+        </ul>
+    </div>
+    My hacky example:
+    <div style="margin-bottom:2rem;">
+        <iframe style="width: 60%; height: 15rem;" src="./animals_example/index.html"></iframe>
+    </div>
+    And most of the relevant code ended up being something like:
+    <div style="margin:0 10rem;">
+        <code style="display: block; white-space: pre-wrap; text-align: left; background-color:#1a1a1a;color:white;">
+
+        processor Animals
+        {
+            output stream float out;
+        
+            // This simple struct holds a note + duration for our melody
+            struct Note
+            {
+                int pitch;
+                float64 length;
+        
+                void play() const
+                {
+                    let numFrames = int (this.length * framesPerQuarterNote);
+                    let frequency  = std::notes::noteToFrequency (this.pitch);
+                    let delta = float (frequency / processor.frequency);
+                    var currVolume = volume;
+                    let volumeDelta = 0.00009f;
+                    
+                    loop (numFrames)
+                    {
+                        out <- currVolume * curr;
+                        curr = curr - delta;
+                        if (currVolume > volumeDelta) {
+                            currVolume = currVolume - volumeDelta;
+                        }
+                        if (curr < 0.0f) {
+                            curr = 1.0f + curr;
+                        }
+                        advance();
+                    }
+                }
+            }
+        
+            // This is our processor's entry-point function, which is invoked
+            // by the system
+            void main()
+            {
+                let melody = Note[] ( (0, 4), (67, 1),  (67, 1),  (67, 1),  (67, 1),
+                                      (65, 1.33),  (65, 1.33),  (65, 1.33),  (63, 2),
+                                      (63, 1),  (60, 1), (0, 2), (60, 2),  (67, 1),  (67, 1),  (67, 1),  (67, 1),
+                                      (65, 1.33),  (65, 1.33),  (65, 1.33),  (68, 2), (67, 2));
+        
+                for (wrap<melody.size> i)
+                    melody[i].play();
+            }
+        
+            // We'll define a couple of constants here to set the volume and tempo
+            let volume = 0.15f;
+            let framesPerQuarterNote = int (processor.frequency / 7);
+        
+            float curr;
+        }
+        
+        
+        processor Kick
+        {
+            output stream float out;
+        
+            // This simple struct holds a note + duration for our melody
+            struct Note
+            {
+                int pitch;
+                float64 length;
+        
+                void play() const
+                {
+                    let numFrames = int (this.length * framesPerQuarterNote);
+                    let frequency  = std::notes::noteToFrequency (this.pitch);
+                    let delta = float (frequency / processor.frequency);
+                    var currVolume = volume;
+                    let volumeDelta = 0.00004f;
+                    
+                    loop (numFrames)
+                    {
+                        out <- currVolume * curr;
+                        curr = curr - delta;
+                        if (currVolume > volumeDelta) {
+                            currVolume = currVolume - volumeDelta;
+                        }
+                        if (curr < 0.0f) {
+                            curr = 1.0f + curr;
+                        }
+                        advance();
+                    }
+                }
+            }
+        
+            // This is our processor's entry-point function, which is invoked
+            // by the system
+            void main()
+            {
+                let melody = Note[] ( (10, 4), (10, 4));
+        
+                for (var i = 0; i < 4; i++)
+                    for (wrap<melody.size> i)
+                        melody[i].play();
+            }
+        
+            // We'll define a couple of constants here to set the volume and tempo
+            let volume = 0.15f;
+            let framesPerQuarterNote = int (processor.frequency / 7);
+        
+            float curr;
+        }
+        
+        
+        processor Mixer
+        {
+            output stream float audioOut;
+        
+            input stream float audioInOne, audioInTwo;
+        
+            void main()
+            {
+                loop
+                {
+                    let wet = float (audioInOne + audioInTwo * 2);
+                    audioOut <- wet;
+                    advance();
+                }
+            }
+        
+        }
+    </code>
+    </div>
+</body>
+
+</html>
