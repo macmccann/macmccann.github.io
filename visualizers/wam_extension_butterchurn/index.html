@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello!</title>
+    <style type="text/css">
+        .body {
+            width: auto;
+        }
+    </style>
+    <script type="module" src="./index.js"></script>
+</head>
+
+<body>
+    <div id="header">
+        <p>Example of a WAM using the video extension. Wait a few seconds after pressing the Start Button. Then you can
+            choose other presets using the drop down menu.</p>
+        <button id="init">Init</button>
+
+        <button id="start">Start</button>
+
+        <button id="note">Note</button>
+
+        <input type="file" id="file" accept="audio/*">
+    </div>
+    <div id="host-main">
+        Sequencer:
+        <div id="sequencer-container">
+        </div>
+
+        Instrument:
+        <div id="instrument-container">
+        </div>
+
+        Effects:
+        <div id="effects-container">
+        </div>
+
+        <canvas id="wam-video" width="640" height="480"></canvas>
+    </div>
+</body>
+
+</html>
