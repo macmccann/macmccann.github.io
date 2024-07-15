@@ -6,6 +6,7 @@ let hasInitialized = false;
 let audioContext = null;
 let hostKey;
 let renderer;
+let count = 0;
 
 /*=====================================================================================
 FILE AUDIO
@@ -285,9 +286,8 @@ async function run() {
 
     await initVideo(audioContext);
 
-    butterchurn = await loadWAM(
-        'https://www.webaudiomodules.com/community/plugins/burns-audio/video_butterchurn/index.js'
-    );
+    butterchurn = await loadWAM('./video_butterchurn_source/dist/index.js');
+    console.log('f: ', butterchurn);
     synth101 = await loadWAM('./lib/synth101/index.js');
 
     synth101.audioNode.connect(butterchurn.audioNode);

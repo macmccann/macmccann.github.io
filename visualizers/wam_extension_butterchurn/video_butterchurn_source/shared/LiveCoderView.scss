@@ -1,0 +1,14 @@
+@import "./ui/glow.scss";
+
+:global(.LiveCoderModule) {
+    flex: 1;
+    display: flex;
+    flex-direction:column;
+    justify-content:space-between;
+    width: 100%;
+    height: 100%;
+    background-color: var(--var-PrimaryBackground, #333333);
+    color: var(--var-PrimaryText, #eeeeee);
+    font-family: var(--var-FontFamily, system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji");
+
+}
