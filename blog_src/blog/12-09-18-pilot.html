@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Pilot
+  </title>
+  <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet"/>
+  <link href="static/css/index.css" rel="stylesheet"/>
+  <link href="static/css/post.css" rel="stylesheet"/>
+  <script async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=sunburst">
+  </script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-132391979-1">
+  </script>
+  <script>
+   window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-132391979-1');
+  </script>
+ </head>
+ <body>
+  <div class="content">
+   <div id="post">
+    <div id="post-meta">
+     <h2>
+      Pilot
+     </h2>
+     <p class="small-gray">
+      Published on 12/09/18
+     </p>
+    </div>
+    <p>
+     Welcome to my blog, Green Text Black Screen! With this post I wanted to start off by writing about a few of the
+  things I wanted to be able to do on this blog and how I made those features happen.
+    </p>
+    <p>
+     One of the first things I knew I wanted to be able to do was write posts in raw HTML, like:
+    </p>
+    <pre class="prettyprint">
+&lt;p&gt;This is a &lt;b&gt;bolded&lt;/b&gt; blog post&lt;/p&gt;
+</pre>
+    <p>
+     This was a lot more for my own benefit than for the actual result, I thought this would give writing the blog a very
+  late 90s, hacker-y feel as opposed to something modern like Markdown.
+    </p>
+    <p>
+     From there I wanted to go to something super new-age: embedding Latex in the blog posts, so I could write:
+    </p>
+    <pre class="prettyprint">
+... blog post stuff ...
+$a^2 + b^2 = c^2$
+... more blog post stuff ...
+</pre>
+    <p>
+     I also knew code was definitely going to be part of a lot of posts, so I needed some way to create those neato dark boxes with neon monospace text you just saw.
+    </p>
+    <p>
+     To do this, I'm using a short, somewhat hacky Python script. The first part of the script takes each file in a posts folder and formats it into a plain old HTML file:
+    </p>
+    <pre class="prettyprint">
+from os import listdir
+from os.path import isfile, join
+
+# constants
+POST_DIR = '../posts/'
+PUBLIC_DIR = '../public/'
+TEMPLATE_DIR = '../templates/'
+
+class Post:
+    def __init__(self, title, web_title, create_date, url):
+        self.title = title
+        self.web_title = web_title
+        self.create_date = create_date
+        self.url = url
+
+# find all of the post files
+post_files = [f for f in listdir(POST_DIR) if isfile(join(POST_DIR, f))] 
+posts = []
+
+for post_file in post_files:
+    with open((POST_DIR + post_file), 'r') as f:
+        post_file_data = f.read()
+    # do something with the post data
+</pre>
+    At this point I realized I could probably use some form of HTML/XML tags to tell the script which bits were Latex and which bits weren't, so I decided that, when writing blog posts, I would just wrap everything in
+    <code class="prettyprint">
+     &lt;latex&gt;
+    </code>
+    tags:
+    <pre class="prettyprint">
+... blog post stuff ...
+&lt;latex&gt;
+$a^2 + b^2 = c^2$
+&lt;/latex&gt;
+... more blog post stuff ...
+</pre>
+    <p>
+     So I went searching around and stumbled upon
+     <a href="https://www.crummy.com/software/BeautifulSoup/">
+      Beautiful Soup
+     </a>
+     . Beautiful Soup is normally designed for web scraping and isn't really meant to build up full HTML documents like I abused it here for, but aside from a few small blips, it did really well.
+    </p>
+    <p>
+     I also had to find a way to automatically format and publish Latex to the web. I knew this was possible from StackOverflow, and after a little struggling, found
+     <a href="https://pandoc.org/">
+      Pandoc
+     </a>
+     , the Python wrapper for Pandoc
+     <a href="https://pypi.org/project/pypandoc/">
+      Pypandoc
+     </a>
+     , and
+     <a href="https://www.mathjax.org/">
+      MathJax
+     </a>
+     , which Pandoc can export to. After starting to use Beautiful Soup, it was pretty easy to find everything in a latex tag and transform it into something MathJax would recognize:
+    </p>
+    <pre class="prettyprint">
+def delatex(latex):
+    return pypandoc.convert_text(latex, 'html', format='latex', extra_args=['--mathjax'])
+
+# find all the latex tags
+latexes = post_soup.find_all('latex')
+for latex in latexes:
+    # convert the latex to html
+    latex_html = delatex(latex.string)
+    latex.replace_with(Soup(latex_html, features="html.parser"))
+</pre>
+    <p>
+     This allows us to use Latex automatically in any post:
+    </p>
+    <p>
+     <span class="math display">
+      \[\sum_{n=1}^\infty \frac{1}{n^2} =
+\frac{\pi^2}{6}\]
+     </span>
+    </p>
+    <p>
+     Making the code segments turned out to be a little bit easier than I expected. I wanted to have syntax highlighting on automatically, regardless of which language I was writing in. At first it seemed like my options weren't the best: either doing my own code styling,
+     <a href="https://gist.github.com/">
+      GitHub Gists
+     </a>
+     (no dark theme), or
+     <a href="https://codepen.io/pen">
+      CodePen Pens
+     </a>
+     (only front-end languages). Then I ran across Google's
+     <a href="https://github.com/google/code-prettify">
+      code prettifier
+     </a>
+     which suited all my needs. Plugging this in was pretty simple and consisted of wrapping all of my code blocks in
+     <code class="prettyprint">
+      &lt;pre class="prettyprint"&gt;
+     </code>
+     tags and including the prettyprint script in the header of each page (I did have to hack around with the CSS styles to get the inlining to work the way I wanted it to).
+    </p>
+    <p>
+     Finally, I needed to serve up my files. Luckily GitHub does free static web hosting with
+     <a href="https://pages.github.com/">
+      GitHub Pages
+     </a>
+     , which I've used for a lot of small projects. Because of the way my script was set up, I needed to serve everything using
+     <code class="prettyprint">
+      public/index.html
+     </code>
+     as the root. A quick search gave me
+     <a href="https://stackoverflow.com/questions/36782467/set-subdirectory-as-website-root-on-github-pages">
+      this StackOverflow post
+     </a>
+     and the necessary git magic,
+     <br/>
+     <code class="prettyprint" style="padding-right: 8px">
+      git subtree push --prefix dist origin gh-pages
+     </code>
+     .
+    </p>
+    <p>
+     All that was left was to bundle everything in a simple deployment script:
+    </p>
+    <pre class="prettyprint">
+# build the pages
+cd src
+python3 template.py
+cd ..
+# add all of the public folder
+git add public &amp;&amp; git commit -m "Automatic deployment commit"
+git subtree push --prefix public origin gh-pages
+</pre>
+   </div>
+   <p class="small-gray">
+    You can view the source for this post on
+    <a href="https://github.com/macmccann/blog">
+     GitHub
+    </a>
+    .
+   </p>
+  </div>
+ </body>
+</html>

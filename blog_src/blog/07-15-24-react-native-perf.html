@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   React Native Performance
+  </title>
+  <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet"/>
+  <link href="static/css/index.css" rel="stylesheet"/>
+  <link href="static/css/post.css" rel="stylesheet"/>
+  <script async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=sunburst">
+  </script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-132391979-1">
+  </script>
+  <script>
+   window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-132391979-1');
+  </script>
+ </head>
+ <body>
+  <div class="content">
+   <div id="post">
+    <div id="post-meta">
+     <h2>
+      React Native Performance
+     </h2>
+     <p class="small-gray">
+      Published on 07/15/24
+     </p>
+    </div>
+    <p>
+     A few moons ago, I was working at a startup that had a problem. We had a
+    pretty decent-looking mobile app that we had built in React Native, but it
+    had been gradually getting slower and slower. We had mostly been ignoring
+    this issue except in extremely bad performance circumstances that we
+    bandaged over. But this issue came to a head when we had to upgrade to React
+    Native 73+ (some Android and iOS bureaucracy had us on a hard deadline to
+    upgrade). When we jumped React Native versions, we got the expected bugs
+    from deprecated APIs being changed, but we also noticed a massive hit to our
+    performance.
+    </p>
+    <p>
+     We had found some
+     <a href="https://github.com/facebook/react-native/issues/36296">
+      GitHub issues
+     </a>
+     indicating similar performance concerns from members of the community, but
+    all of the proposed solutions were either already integrated into v73 or
+    didn't speed up our app.
+    </p>
+    <h3>
+     Render times/passive effects
+    </h3>
+    <p>
+     We did what any good React Native developer would do any opened up
+    Flipper/React Devtools to investigate what was causing slow renders.
+    Unfortunately, our renders mostly seemed to be within the range we expected,
+    although some of our screens were making a few requests and re-rendering
+    with the new data every time any request came back. So I went and tried to
+    reduce the number of re-renders for a week, but even when I reduced one of
+    our screens to a super basic data fetch and display, there was still a ton
+    of lag on screen animations when navigating around. We did notice that there
+    was a lot of time taken in “passive effects”, which was a big clue for us,
+    but didn't seem to explain our issues given: 1) these effects are supposed
+    to be passive(!) and not interrupt re-renders 2) there didn't seem to be any
+    changes to the way
+     <code class="prettyprint">
+      useEffect
+     </code>
+     calls were
+    handled from React Native 69 to React Native 73.
+    </p>
+    <h3>
+     React navigation performance
+    </h3>
+    <p>
+     Eventually, I decided to give up on the React devtools approach and honed in
+    on the difference between the performance on v69 and v73. We didn’t have any
+    good metrics on app latency and all of our own feedback on latency had been
+    around “feel” - the app just felt more sluggish across the board. I
+    eventually narrowed down one interaction that definitely changed from v69 to
+    v73 - when tapping into one of our heavier screens, the time for the swipe
+    animation to start increased drastically on the upgraded version. At this
+    point, I started investigating our navigation library (
+     <a href="https://reactnavigation.org/">
+      React Navigation
+     </a>
+     ). We figured out that something in the initial render was taking a lot
+    longer in the new React Native version, and we could mitigate the lag
+    symptoms by doing something like:
+    </p>
+    <pre class="prettyprint">
+const MyHeavyComponent: React.FC = () =&gt; {
+    useEffect(() =&gt; {
+        ...
+    });
+
+    return &lt;HeavyStuff /&gt;;
+};
+
+const MyComponent = () =&gt; {
+    const [shouldRender, setShouldRender] = useState(false);
+    InteractionManager.runAfterInteractions(()=&gt;
+        setShouldRender(true);
+    });
+
+    if (!shouldRender) {
+        return &lt;Spinner /&gt;;
+    }
+
+    return &lt;MyHeavyComponent /&gt;;
+}    
+</pre>
+    <p>
+     NovemberFive has a great post on this technique
+     <a href="https://medium.com/@NovemberFive/fixing-common-performance-problems-in-react-navigation-8eea6dc7c5ba">
+      here
+     </a>
+     .
+    </p>
+    <p>
+     This made the app a lot faster in this particular interaction, but it still wasn't a particularly satisfying solution. For one, we still didn't know what had changed from version to version to make this experience worse. We also would have had to implement this bandaid for every screen in the app, and it didn't fix all interactions (e.g. if you navigated into a screen and then immediately back, the animations would hitch).
+    </p>
+    <p>
+     After a lot more bisecting, stripping down the code, and using the passive effects clues, I finally figured out a behavior that had changed from React Navigation in the upgrade: in React Native v69, effects that ran on the first render were run after the animation started (concurrently with the animation), whereas in RN v71+, effects that ran on the first render were run and completed before the swipe animation started.
+    </p>
+    <p>
+     This means that if you had a screen like the following:
+    </p>
+    <pre class="prettyprint">
+const MyScreen = () =&gt; {
+    useEffect(() =&gt; {
+        doAMillionThingsSynchronously();
+    }, []);
+    return &lt;Content /&gt;;
+}    
+</pre>
+    <p>
+     it would start the swipe animation significantly later on v73 than on v69.
+    </p>
+    <h3>
+     What's the deal with useEffect?
+    </h3>
+    <p>
+     Now we had to figure out what the cause of the large
+     <code class="prettyprint">
+      useEffect
+     </code>
+     s was. Digging down the stack, it didn't seem like any significant work was going on, and React devtools wasn't giving us any hints on the large passive effects. A performance engineer from a different company had recommended using the
+     <a href="https://github.com/jlfwong/speedscope/wiki/Importing-from-Hermes">
+      Hermes profiling instructions on Speedscope
+     </a>
+     at some point, so I booted it up in our production build on a real phone.
+    </p>
+    <img alt="Girl in a jacket" src="./static/img/speedscope.png"/>
+    <p>
+     The big blob of JS callback hell in the middle that is taking 1.6 seconds is essentially a
+     <code class="prettyprint">
+      JSON.stringify
+     </code>
+     equivalent that was getting called by
+     <a href="https://docs.sentry.io/platforms/javascript/guides/react/features/redux/">
+      Sentry's Redux middleware
+     </a>
+     . This gave me a good idea of that the culprit was Sentry's state and action serialization for
+     <a href="https://redux.js.org/tutorials/fundamentals/part-3-state-actions-reducers">
+      Redux
+     </a>
+     , as we had had issues with extremely large payloads for Sentry's breadcrumbs in the past (with some of our endpoints returning megabytes of JSON).
+    </p>
+    <p>
+     Sentry does provide
+     <code class="prettyprint">
+      stateTransformer
+     </code>
+     and
+     <code class="prettyprint">
+      actionTransformer
+     </code>
+     options when initializing the Redux middleware, so by inserting some
+     <code class="prettyprint">
+      stateTransformer: () =&gt; null
+     </code>
+     and kicking off a production build, I was able to confirm that the performance issues in
+     <code class="prettyprint">
+      useEffects
+     </code>
+     were because of Sentry's serialization.
+    </p>
+    <p>
+     I also noticed we had
+     <code class="prettyprint">
+      normalizeDepth: 5
+     </code>
+     in our Sentry initializer, which was contributing to our serialization issue.
+    </p>
+    <p>
+     Some of the mobile devs at the company liked Sentry having access to our actions for debugging purposes, so we ended up with a solution that looked something like this:
+    </p>
+    <pre class="prettyprint">
+const OMITTED_ACTION_TYPES: Set<string> = new Set([
+    'user_info',
+]);
+
+export const sentryReduxEnhancer = Sentry.createReduxEnhancer({
+    stateTransformer: () =&gt; null,
+    actionTransformer: (action: Action) =&gt; {
+        if (
+        OMITTED_ACTION_TYPES.contains(action.type)
+        ) {
+        return { ...action, payload: {} };
+        } else if (__DEV__ &amp;&amp; JSON.stringify(action).length &gt; 50000) {
+        // eslint-disable-next-line no-console
+        console.error(
+            `[Internal] Redux Sentry Performance: action of type ${
+            action.type
+            } too large, skipping breadcrumb. Please add ${action.type.toLowerCase()} to the OMITTED_ACTION_TYPES array.`,
+        );
+        return null;
+        }
+        return action;
+    },
+});
+</string></pre>
+    <p>
+     …and voila, we had eliminated almost all of the performance hitches in our React Native app with only a few lines of code!
+    </p>
+    <h3>
+     Takeaways
+    </h3>
+    <p>
+     1. While React DevTools can be very valuable for identifying some component performance issues, it doesn't tell you the entire story of the JS stack; there can be other sources of latency in your app besides just the render body.
+    </p>
+    <p>
+     2.
+     <a href="https://kentcdodds.com/blog/fix-the-slow-render-before-you-fix-the-re-render">
+      Fix the slow render before you fix the re-render
+     </a>
+     . I spent way too long trying to cut down the number of re-renders in our app, thinking that the problem was not enough
+     <code class="prettyprint">
+      useMemo
+     </code>
+     or
+     <code class="prettyprint">
+      useCallback
+     </code>
+     . In reality, most of these re-renders were very easy for the processor to handle.
+    </p>
+    <p>
+     3. When trying to identify performance issues, narrow down the very specific aspect of your app that is lagging and break it down to the smallest reproducible example (just like with any debugging).
+    </p>
+   </div>
+   <p class="small-gray">
+    You can view the source for this post on
+    <a href="https://github.com/macmccann/blog">
+     GitHub
+    </a>
+    .
+   </p>
+  </div>
+ </body>
+</html>
