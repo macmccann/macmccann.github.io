@@ -323,7 +323,7 @@ document.getElementById("start").addEventListener("click", () => {
     run();
 });
 
-document.getElementById("note").addEventListener("click", () => {
+document.getElementById("note").addEventListener("mousedown", () => {
     synth101.audioNode.scheduleEvents({ type: 'wam-midi', time: synth101.audioNode.context.currentTime, data: { bytes: new Uint8Array([0x90, 74, 100]) } });
     synth101.audioNode.scheduleEvents({ type: 'wam-midi', time: synth101.audioNode.context.currentTime + 0.25, data: { bytes: new Uint8Array([0x80, 74, 100]) } });
 })
