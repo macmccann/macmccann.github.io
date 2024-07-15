@@ -1,8 +1,8 @@
 // the code below will get moved to the wam-extensions repo
 // and could be imported from webaudiomodules.com in the future
-let ended = false;
 let synth101;
 let butterchurn;
+let hasInitialized = false;
 
 document
     .getElementById("file")
@@ -213,10 +213,22 @@ void main() {
 
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 
+const setUIStateForLoading = () => {
+    document.getElementById("init-button").src = "./assets/loading.svg";
+    document.getElementById("init").style.cursor = "wait";
+}
+
 let audioContext = null;
 document.getElementById("init").addEventListener("click", () => {
-    audioContext = new AudioCtx();
-    console.log(audioContext.audioWorklet);
+    if (hasInitialized) return;
+    hasInitialized = true;
+    const init = async () => {
+        setUIStateForLoading();
+        audioContext = new AudioCtx();
+        await run();
+        document.getElementById("init").style.display = 'none';
+    }
+    init();
 });
 
 
@@ -254,13 +266,6 @@ async function loadWAM(path) {
     return instance;
 }
 
-
-function renderPluginList(el, plugins) {
-    plugins.forEach(p => {
-        document.create
-    })
-}
-
 async function initVideo(context) {
     let canvas = document.getElementById("wam-video")
     renderer = new CanvasRenderer(canvas);
@@ -273,7 +278,7 @@ async function run() {
     await initVideo(audioContext);
 
     butterchurn = await loadWAM("https://www.webaudiomodules.com/community/plugins/burns-audio/video_butterchurn/index.js")
-    synth101 = await loadWAM('./synth101/index.js')
+    synth101 = await loadWAM('./lib/synth101/index.js')
 
     synth101.audioNode.connect(butterchurn.audioNode);
     butterchurn.audioNode.connect(audioContext.destination);
@@ -318,10 +323,6 @@ function renderVideo() {
     window.requestAnimationFrame(renderVideo);
 
 }
-
-document.getElementById("start").addEventListener("click", () => {
-    run();
-});
 
 document.getElementById("note").addEventListener("mousedown", () => {
     synth101.audioNode.scheduleEvents({ type: 'wam-midi', time: synth101.audioNode.context.currentTime, data: { bytes: new Uint8Array([0x90, 74, 100]) } });
