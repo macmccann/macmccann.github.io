@@ -1,4 +1,4 @@
-import FFT from './fft';
+import FFT from './fft.js';
 
 export default class AudioProcessor {
     constructor(context) {

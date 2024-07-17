@@ -76,21 +76,21 @@ export default class AudioLevels {
         return Number.isFinite(num) && !Number.isNaN(num);
     }
 
-    static adjustRateToFPS(rate, baseFPS, FPS) {
-        return rate ** (baseFPS / FPS);
-    }
+    // static adjustRateToFPS(rate, baseFPS, FPS) {
+    //     return rate ** (baseFPS / FPS);
+    // }
 
-    updateAudioLevels(fps, frame) {
+    updateAudioLevels() {
         if (this.audio.freqArray.length > 0) {
-            let effectiveFPS = fps;
-            if (
-                !AudioLevels.isFiniteNumber(effectiveFPS) ||
-                effectiveFPS < 15
-            ) {
-                effectiveFPS = 15;
-            } else if (effectiveFPS > 144) {
-                effectiveFPS = 144;
-            }
+            // let effectiveFPS = fps;
+            // if (
+            //     !AudioLevels.isFiniteNumber(effectiveFPS) ||
+            //     effectiveFPS < 15
+            // ) {
+            //     effectiveFPS = 15;
+            // } else if (effectiveFPS > 144) {
+            //     effectiveFPS = 144;
+            // }
 
             // Clear for next loop
             this.imm.fill(0);
@@ -107,15 +107,15 @@ export default class AudioLevels {
                 } else {
                     rate = 0.5;
                 }
-                rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
+                // rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
                 this.avg[i] = this.avg[i] * rate + this.imm[i] * (1 - rate);
 
-                if (frame < 50) {
-                    rate = 0.9;
-                } else {
-                    rate = 0.992;
-                }
-                rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
+                // if (frame < 50) {
+                //     rate = 0.9;
+                // } else {
+                rate = 0.992;
+                // }
+                // rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
                 this.longAvg[i] =
                     this.longAvg[i] * rate + this.imm[i] * (1 - rate);
 

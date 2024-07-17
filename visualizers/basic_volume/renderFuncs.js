@@ -1,0 +1,88 @@
+import COLOR_THEMES from './colorThemes.js';
+import Options from './options.js';
+
+export const RENDER_FUNCS = {
+    bars: (audio, canvas, ctx) => {
+        const data = audio.freqArrayL;
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const numBars = data.length;
+
+        // Calculate logarithmic positions for each bar
+        let totalLog = 0;
+        const logWidths = [];
+
+        let cumulativeWidth = 0;
+
+        for (let i = 0; i < numBars; i++) {
+            if (i === 0) {
+                logWidths.push(1);
+                totalLog += 1;
+            } else {
+                const logWidth = Math.log10(i + 1) - Math.log10(i);
+                logWidths.push(logWidth);
+                totalLog += logWidth;
+            }
+        }
+
+        // Draw each bar with logarithmically adjusted widths
+        for (let i = 0; i < numBars; i++) {
+            const logWidth = (logWidths[i] / totalLog) * canvasWidth;
+
+            const barHeight = (data[i] * canvasHeight) / 20;
+            ctx.fillStyle =
+                COLOR_THEMES[Options.getOption('theme')].primary;
+            ctx.fillRect(
+                cumulativeWidth,
+                canvasHeight - barHeight,
+                logWidth,
+                barHeight
+            );
+            cumulativeWidth += logWidth;
+        }
+    },
+    line: (audio, canvas, ctx) => {
+        const data = audio.freqArrayL;
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const numBars = data.length;
+
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        // Calculate logarithmic positions for each bar
+        let totalLog = 0;
+        const logWidths = [];
+
+        for (let i = 0; i < numBars; i++) {
+            if (i === 0) {
+                logWidths.push(1);
+                totalLog += 1;
+            } else {
+                const logWidth = Math.log10(i + 1) - Math.log10(i);
+                logWidths.push(logWidth);
+                totalLog += logWidth;
+            }
+        }
+        let cumulativeWidth = 0;
+
+        ctx.beginPath();
+        for (let i = 0; i < numBars; i++) {
+            const logWidth = (logWidths[i] / totalLog) * canvasWidth;
+
+            const x = cumulativeWidth + logWidth / 2;
+            const y = canvasHeight - (data[i] * canvasHeight) / 20;
+
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+
+            cumulativeWidth += logWidth;
+        }
+        ctx.strokeStyle = COLOR_THEMES[Options.getOption('theme')].primary;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    },
+};

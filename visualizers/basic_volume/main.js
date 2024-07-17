@@ -1,4 +1,4 @@
-import AudioProcessor from './audioprocessor';
+import Visualizer from './visualizer.js';
 
 document
     .getElementById('audioFileInput')
@@ -60,13 +60,18 @@ function initAudio(audioData) {
         source = audioContext.createBufferSource();
         source.buffer = buffer;
         source.connect(analyser);
-        analyser.connect(audioContext.destination);
         source.onended = () => {
             ended = true;
         };
 
+        visualizer = new Visualizer(audioContext);
+        visualizer.connectAudio(analyser);
+        analyser.connect(audioContext.destination);
+
         source.start();
-        initWebGL();
+        // initWebGL();
+
+        startRenderer();
     });
 }
 
@@ -121,9 +126,6 @@ function initWebGL() {
     gl.enableVertexAttribArray(barTypeLocation);
     gl.vertexAttribPointer(barTypeLocation, 1, gl.FLOAT, false, 12, 8);
 
-    visualizer = new Visualizer(audioContext);
-
-    startRenderer();
 }
 
 const startRenderer = () => {
@@ -156,50 +158,50 @@ function createProgram(gl, vertexShader, fragmentShader) {
     return program;
 }
 
-const linearSmoothDownwardsForPeak = (
-    current,
-    previous,
-    rampTimesSeconds,
-    secondsSinceLastFrame
-) => {
-    if (current > previous) {
-        return current;
-    }
-    const { RAMP_LENGTH_DOWN_SECONDS } = rampTimesSeconds;
-    const frames = RAMP_LENGTH_DOWN_SECONDS / secondsSinceLastFrame;
-    const step = (previous - current) / frames;
-    if (Math.abs(step) < STEP_EPSILON) {
-        return current;
-    }
-    const next = previous - step;
-    return next;
-};
+// const linearSmoothDownwardsForPeak = (
+//     current,
+//     previous,
+//     rampTimesSeconds,
+//     secondsSinceLastFrame
+// ) => {
+//     if (current > previous) {
+//         return current;
+//     }
+//     const { RAMP_LENGTH_DOWN_SECONDS } = rampTimesSeconds;
+//     const frames = RAMP_LENGTH_DOWN_SECONDS / secondsSinceLastFrame;
+//     const step = (previous - current) / frames;
+//     if (Math.abs(step) < STEP_EPSILON) {
+//         return current;
+//     }
+//     const next = previous - step;
+//     return next;
+// };
 
-const linearSmoothUpDownForPeak = (
-    current,
-    previous,
-    rampTimesSeconds,
-    secondsSinceLastFrame
-) => {
-    const { RAMP_LENGTH_UP_SECONDS, RAMP_LENGTH_DOWN_SECONDS } =
-        rampTimesSeconds;
-    if (secondsSinceLastFrame === 0) {
-        return previous;
-    }
+// const linearSmoothUpDownForPeak = (
+//     current,
+//     previous,
+//     rampTimesSeconds,
+//     secondsSinceLastFrame
+// ) => {
+//     const { RAMP_LENGTH_UP_SECONDS, RAMP_LENGTH_DOWN_SECONDS } =
+//         rampTimesSeconds;
+//     if (secondsSinceLastFrame === 0) {
+//         return previous;
+//     }
 
-    let frames = 0;
-    if (current > previous) {
-        frames = RAMP_LENGTH_UP_SECONDS / secondsSinceLastFrame;
-    } else {
-        frames = RAMP_LENGTH_DOWN_SECONDS / secondsSinceLastFrame;
-    }
-    const step = (current - previous) / frames;
-    if (Math.abs(step) < STEP_EPSILON) {
-        return current;
-    }
-    const next = previous + step;
-    return next;
-};
+//     let frames = 0;
+//     if (current > previous) {
+//         frames = RAMP_LENGTH_UP_SECONDS / secondsSinceLastFrame;
+//     } else {
+//         frames = RAMP_LENGTH_DOWN_SECONDS / secondsSinceLastFrame;
+//     }
+//     const step = (current - previous) / frames;
+//     if (Math.abs(step) < STEP_EPSILON) {
+//         return current;
+//     }
+//     const next = previous + step;
+//     return next;
+// };
 
 // const drawBars = (peakVolume, peakVolumeUpDownSmoothed) => {
 //     const volumeLocation = gl.getUniformLocation(program, 'u_volume');
@@ -277,95 +279,73 @@ const linearSmoothUpDownForPeak = (
 //     requestAnimationFrame(render);
 // };
 
-const getPeakHold = (
-    peakVolume,
-    prevPeakHold,
-    currentTime,
-    secondsSinceLastFrame
-) => {
-    if (peakVolume >= prevPeakHold.value) {
-        return { value: peakVolume, time: currentTime };
-    }
-    if (currentTime - prevPeakHold.time > PEAK_HOLD_DECAY_MS) {
-        return {
-            value: linearSmoothUpDownForPeak(
-                peakVolume,
-                prevPeakHold.value,
-                {
-                    RAMP_LENGTH_UP_SECONDS,
-                    RAMP_LENGTH_DOWN_SECONDS: PEAK_RAMP_LENGTH_DOWN_SECONDS,
-                },
-                secondsSinceLastFrame
-            ),
-            time: prevPeakHold.time,
-        };
-    }
-    return prevPeakHold;
-};
+// const getPeakHold = (
+//     peakVolume,
+//     prevPeakHold,
+//     currentTime,
+//     secondsSinceLastFrame
+// ) => {
+//     if (peakVolume >= prevPeakHold.value) {
+//         return { value: peakVolume, time: currentTime };
+//     }
+//     if (currentTime - prevPeakHold.time > PEAK_HOLD_DECAY_MS) {
+//         return {
+//             value: linearSmoothUpDownForPeak(
+//                 peakVolume,
+//                 prevPeakHold.value,
+//                 {
+//                     RAMP_LENGTH_UP_SECONDS,
+//                     RAMP_LENGTH_DOWN_SECONDS: PEAK_RAMP_LENGTH_DOWN_SECONDS,
+//                 },
+//                 secondsSinceLastFrame
+//             ),
+//             time: prevPeakHold.time,
+//         };
+//     }
+//     return prevPeakHold;
+// };
 
-function render(currentTime) {
-    analyser.getByteTimeDomainData(dataArray);
+// function render(currentTime) {
+//     analyser.getByteTimeDomainData(dataArray);
 
-    // Idk man
-    if (lastRenderTime == null || lastRenderTime <= 0) {
-        lastRenderTime = currentTime;
-        requestAnimationFrame(render);
-        return;
-    }
+//     // Idk man
+//     if (lastRenderTime == null || lastRenderTime <= 0) {
+//         lastRenderTime = currentTime;
+//         requestAnimationFrame(render);
+//         return;
+//     }
 
-    const msSinceLastFrame = currentTime - lastRenderTime;
-    const secondsSinceLastFrame = msSinceLastFrame / 1000;
+//     const msSinceLastFrame = currentTime - lastRenderTime;
+//     const secondsSinceLastFrame = msSinceLastFrame / 1000;
 
-    lastRenderTime = currentTime;
+//     lastRenderTime = currentTime;
 
-    // Compute peak volume
-    let peakVolumeThisBuffer = 0;
-    if (!ended) {
-        peakVolumeThisBuffer =
-            dataArray.reduce((a, b) => {
-                return Math.max(a, Math.abs(b - 128));
-            }, 0) / 128;
-    }
-    peakVolume = linearSmoothDownwardsForPeak(
-        peakVolumeThisBuffer,
-        peakVolume,
-        { RAMP_LENGTH_UP_SECONDS, RAMP_LENGTH_DOWN_SECONDS },
-        secondsSinceLastFrame
-    );
-    peakVolumeUpDownSmoothed = linearSmoothUpDownForPeak(
-        peakVolumeThisBuffer,
-        peakVolumeUpDownSmoothed,
-        { RAMP_LENGTH_UP_SECONDS, RAMP_LENGTH_DOWN_SECONDS },
-        secondsSinceLastFrame
-    );
-    peakHold = getPeakHold(
-        peakVolume,
-        peakHold,
-        currentTime,
-        secondsSinceLastFrame
-    );
+//     // Compute peak volume
+//     let peakVolumeThisBuffer = 0;
+//     if (!ended) {
+//         peakVolumeThisBuffer =
+//             dataArray.reduce((a, b) => {
+//                 return Math.max(a, Math.abs(b - 128));
+//             }, 0) / 128;
+//     }
+//     peakVolume = linearSmoothDownwardsForPeak(
+//         peakVolumeThisBuffer,
+//         peakVolume,
+//         { RAMP_LENGTH_UP_SECONDS, RAMP_LENGTH_DOWN_SECONDS },
+//         secondsSinceLastFrame
+//     );
+//     peakVolumeUpDownSmoothed = linearSmoothUpDownForPeak(
+//         peakVolumeThisBuffer,
+//         peakVolumeUpDownSmoothed,
+//         { RAMP_LENGTH_UP_SECONDS, RAMP_LENGTH_DOWN_SECONDS },
+//         secondsSinceLastFrame
+//     );
+//     peakHold = getPeakHold(
+//         peakVolume,
+//         peakHold,
+//         currentTime,
+//         secondsSinceLastFrame
+//     );
 
-    // drawBars(peakVolume, peakVolumeUpDownSmoothed, peakHold);
-}
-
-export default class Visualizer {
-    constructor(audioContext) {
-        this.audio = new AudioProcessor(audioContext);
-        this.audioLevels = new AudioLevels(this.audio);
-    }
-
-    render() {
-        this.audio.sampleAudio();
-        this.audioLevels.updateLevels();
-        this.audioLevels.updatePeakHold();
-    }
-
-    connectAudio(audioNode) {
-        this.audioNode = audioNode;
-        this.audio.connectAudio(audioNode);
-    }
-
-    disconnectAudio(audioNode) {
-        this.audio.disconnectAudio(audioNode);
-    }
-}
+//     // drawBars(peakVolume, peakVolumeUpDownSmoothed, peakHold);
+// }
