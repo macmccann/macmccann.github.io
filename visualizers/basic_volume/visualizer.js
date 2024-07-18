@@ -1,8 +1,8 @@
 import AudioLevels from './audioLevels.js';
 import AudioProcessor from './audioprocessor.js';
-import Options from './options.js';
 import { RENDER_FUNCS } from './renderFuncs.js';
-import COLOR_THEMES from './colorThemes.js';
+import ColorThemes from './colorThemes.js';
+import Options from './options.js';
 
 export default class Visualizer {
     constructor(audioContext) {
@@ -12,8 +12,6 @@ export default class Visualizer {
         // Get the canvas element and its context
         this.canvas = document.getElementById('volumeBarCanvas');
         this.ctx = this.canvas.getContext('2d');
-
-        this.renderMode = 'line';
     }
 
     render() {
@@ -32,10 +30,10 @@ export default class Visualizer {
     }
 
     renderWebGL() {
-        const renderFunc = RENDER_FUNCS[this.renderMode];
         // Clear the canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        const renderFunc = RENDER_FUNCS[Options.getOption('visualizer')];
         renderFunc(this.audio, this.canvas, this.ctx);
     }
 
@@ -80,8 +78,7 @@ export default class Visualizer {
 
             cumulativeWidth += logWidth;
         }
-        this.ctx.strokeStyle =
-            COLOR_THEMES[Options.getOption('colorTheme')].primary;
+        this.ctx.strokeStyle = ColorThemes.getTheme().primary;
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
     }

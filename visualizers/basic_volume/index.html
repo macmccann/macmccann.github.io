@@ -4,23 +4,23 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Web Audio API and WebGL Example</title>
-        <style>
-            body {
-                background-color: black;
-            }
-
-            canvas {
-                display: block;
-                margin: 0 auto;
-                background-color: black;
-            }
-        </style>
         <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.2/math.min.js></script>
         <script src="./lib/math-extensions.js"></script>
+        <link rel="stylesheet" href="./index.css">
     </head>
 
     <body>
         <input type="file" id="audioFileInput" accept="audio/*" />
+        <select name="color-theme" id="colorThemeSelect">
+            <option value="foam">foam</option>
+            <option value="fire">fire</option>
+            <option value="bubblegum">bubblegum</option>
+            <option value="galaxy">galaxy</option>
+        </select> 
+        <select name="visualizer-mode" id="modeSelect">
+            <option value="line">line</option>
+            <option value="bars">bars</option>
+        </select> 
         <canvas id="volumeBarCanvas" width="640" height="640"></canvas>
         <script type="module" src="main.js"></script>
     </body>

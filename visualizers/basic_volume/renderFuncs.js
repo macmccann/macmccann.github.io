@@ -1,5 +1,4 @@
-import COLOR_THEMES from './colorThemes.js';
-import Options from './options.js';
+import ColorThemes from './colorThemes.js';
 
 export const RENDER_FUNCS = {
     bars: (audio, canvas, ctx) => {
@@ -29,9 +28,8 @@ export const RENDER_FUNCS = {
         for (let i = 0; i < numBars; i++) {
             const logWidth = (logWidths[i] / totalLog) * canvasWidth;
 
-            const barHeight = (data[i] * canvasHeight) / 20;
-            ctx.fillStyle =
-                COLOR_THEMES[Options.getOption('theme')].primary;
+            const barHeight = data[i] * canvasHeight / 20;
+            ctx.fillStyle = ColorThemes.getTheme().primary;
             ctx.fillRect(
                 cumulativeWidth,
                 canvasHeight - barHeight,
@@ -81,7 +79,7 @@ export const RENDER_FUNCS = {
 
             cumulativeWidth += logWidth;
         }
-        ctx.strokeStyle = COLOR_THEMES[Options.getOption('theme')].primary;
+        ctx.strokeStyle = ColorThemes.getTheme().primary;
         ctx.lineWidth = 2;
         ctx.stroke();
     },

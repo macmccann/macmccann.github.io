@@ -34,7 +34,6 @@ const generateNew = () => {
     majorChordCheckbox.checked ? "Major chord" : null,
     minorChordCheckbox.checked ? "Minor chord" : null,
   ].filter((type) => type !== null);
-  console.log(validTypes);
   const type = validTypes[Math.floor(Math.random() * validTypes.length)];
   const stringRange = stringRangesCheckbox.checked
     ? stringRanges[Math.floor(Math.random() * stringRanges.length)]
@@ -88,7 +87,6 @@ document.getElementById("bpm").addEventListener("input", () => {
   }
   if (autoCheckbox.checked) {
     const bpm = bpmInput.value;
-    console.log(bpm);
     const interval = 60000 / bpm;
     intervalId = setInterval(() => {
       const { note, type, stringRange, fretRange } = generateNew();

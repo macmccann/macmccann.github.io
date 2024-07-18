@@ -1,14 +1,40 @@
-@import url("https://webglfundamentals.org/webgl/lessons/resources/../../resources/webgl-tutorials.css");
+:root {
+    --primary-color: #abffca;
+    --secondary-color: #000000;
+    --text-color: #ffffff;
+}
+
+[data-theme='foam'] {
+    --primary-color: #abffca;
+    --secondary-color: #000000;
+    --text-color: #ffffff;
+}
+
+[data-theme='fire'] {
+    --primary-color: #ff0000;
+    --secondary-color: #000000;
+    --text-color: #ffffff;
+}
+
+[data-theme='bubblegum'] {
+  --primary-color: #ffffff;
+  --secondary-color: #ffd1f2;
+  --text-color: #c783c7;
+}
+
+[data-theme='galaxy'] {
+  --primary-color: #e8daed;
+  --secondary-color: #2a313e;
+  --text-color: #e8daed;
+}
 
 body {
-  margin: 0;
-  background-color: black;
+    margin: 0;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
 }
 
 canvas {
-  width: 100vw;
-  height: 100vh;
-  display: block;
-  background-color: black;
-
+    display: block;
+    margin: 0 auto;
 }

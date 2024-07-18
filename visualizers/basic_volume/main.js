@@ -1,3 +1,5 @@
+import ColorThemes from './colorThemes.js';
+import Options from './options.js';
 import Visualizer from './visualizer.js';
 
 document
@@ -125,7 +127,6 @@ function initWebGL() {
 
     gl.enableVertexAttribArray(barTypeLocation);
     gl.vertexAttribPointer(barTypeLocation, 1, gl.FLOAT, false, 12, 8);
-
 }
 
 const startRenderer = () => {
@@ -349,3 +350,15 @@ function createProgram(gl, vertexShader, fragmentShader) {
 
 //     // drawBars(peakVolume, peakVolumeUpDownSmoothed, peakHold);
 // }
+
+document
+    .getElementById('colorThemeSelect')
+    .addEventListener('change', (event) => {
+        ColorThemes.setTheme(event.target.value);
+    });
+
+document
+    .getElementById('modeSelect')
+    .addEventListener('change', (event) => {
+        Options.setOption('visualizer', event.target.value);
+    });
