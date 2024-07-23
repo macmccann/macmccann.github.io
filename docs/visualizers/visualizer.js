@@ -1,5 +1,5 @@
 import AudioLevels from './audioLevels.js';
-import AudioProcessor from './audioprocessor.js';
+import AudioProcessor from './audioProcessor.js';
 import { RENDER_FUNCS } from './renderFuncs.js';
 import ColorThemes from './colorThemes.js';
 import Options from './options.js';
