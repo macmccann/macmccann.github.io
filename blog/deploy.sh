@@ -2,4 +2,4 @@
 cd src
 python3 template.py
 cd ..
-cp -r ./blog ../
+cp -r ./blog ../public/
