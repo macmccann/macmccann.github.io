@@ -27,6 +27,7 @@ class ColorThemes {
     static setTheme(newTheme) {
         Options.setOption('theme', newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
+        document.getElementById('colorThemeSelect').value = newTheme;
     }
 }
 

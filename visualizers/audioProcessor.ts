@@ -1,37 +1,58 @@
 import FFT from './fft.js';
 
 export default class AudioProcessor {
-    constructor(context) {
+    numSamps: number;
+    fftSize: number;
+    fft: FFT;
+    audioContext: AudioContext;
+    audible: DelayNode;
+    analyser: AnalyserNode;
+    analyserL: AnalyserNode;
+    analyserR: AnalyserNode;
+    splitter: ChannelSplitterNode;
+    timeByteArray: Uint8Array;
+    timeByteArrayL: Uint8Array;
+    timeByteArrayR: Uint8Array;
+    timeArray: Int8Array;
+    timeByteArraySignedL: Int8Array;
+    timeByteArraySignedR: Int8Array;
+    tempTimeArrayL: Int8Array;
+    tempTimeArrayR: Int8Array;
+    timeArrayL: Int8Array;
+    timeArrayR: Int8Array;
+    freqArray: Float32Array;
+    freqArrayL: Float32Array;
+    freqArrayR: Float32Array;
+
+    constructor(context: AudioContext) {
         this.numSamps = 512;
         this.fftSize = this.numSamps * 2;
 
         this.fft = new FFT(this.fftSize, 512, true);
 
-        if (context) {
-            this.audioContext = context;
-            this.audible = context.createDelay();
+        this.audioContext = context;
+        this.audible = context.createDelay();
 
-            this.analyser = context.createAnalyser();
-            this.analyser.smoothingTimeConstant = 0.0;
-            this.analyser.fftSize = this.fftSize;
+        this.analyser = context.createAnalyser();
+        this.analyser.smoothingTimeConstant = 0.0;
+        this.analyser.fftSize = this.fftSize;
 
-            this.audible.connect(this.analyser);
+        this.audible.connect(this.analyser);
 
-            // Split channels
-            this.analyserL = context.createAnalyser();
-            this.analyserL.smoothingTimeConstant = 0.0;
-            this.analyserL.fftSize = this.fftSize;
+        // Split channels
+        this.analyserL = context.createAnalyser();
+        this.analyserL.smoothingTimeConstant = 0.0;
+        this.analyserL.fftSize = this.fftSize;
 
-            this.analyserR = context.createAnalyser();
-            this.analyserR.smoothingTimeConstant = 0.0;
-            this.analyserR.fftSize = this.fftSize;
+        this.analyserR = context.createAnalyser();
+        this.analyserR.smoothingTimeConstant = 0.0;
+        this.analyserR.fftSize = this.fftSize;
 
-            this.splitter = context.createChannelSplitter(2);
+        this.splitter = context.createChannelSplitter(2);
 
-            this.audible.connect(this.splitter);
-            this.splitter.connect(this.analyserL, 0);
-            this.splitter.connect(this.analyserR, 1);
-        }
+        this.audible.connect(this.splitter);
+        this.splitter.connect(this.analyserL, 0);
+        this.splitter.connect(this.analyserR, 1);
 
         // Initialised once as typed arrays
         // Used for webaudio API raw (time domain) samples. 0 -> 255
@@ -51,6 +72,11 @@ export default class AudioProcessor {
         // Undersampled from this.fftSize to this.numSamps
         this.timeArrayL = new Int8Array(this.numSamps);
         this.timeArrayR = new Int8Array(this.numSamps);
+
+        // Frequency domain arrays
+        this.freqArray = new Float32Array(0);
+        this.freqArrayL = new Float32Array(0);
+        this.freqArrayR = new Float32Array(0);
     }
 
     sampleAudio() {
@@ -59,7 +85,12 @@ export default class AudioProcessor {
         this.analyserR.getByteTimeDomainData(this.timeByteArrayR);
         this.processAudio();
     }
-    updateAudio(timeByteArray, timeByteArrayL, timeByteArrayR) {
+
+    updateAudio(
+        timeByteArray: Uint8Array,
+        timeByteArrayL: Uint8Array,
+        timeByteArrayR: Uint8Array
+    ) {
         this.timeByteArray.set(timeByteArray);
         this.timeByteArrayL.set(timeByteArrayL);
         this.timeByteArrayR.set(timeByteArrayR);
@@ -102,12 +133,12 @@ export default class AudioProcessor {
         );
     }
 
-    connectAudio(audionode) {
-        audionode.connect(this.audible);
+    connectAudio(audioNode: AudioNode) {
+        audioNode.connect(this.audible);
     }
 
-    disconnectAudio(audionode) {
-        audionode.disconnect(this.audible);
+    disconnectAudio(audioNode: AudioNode) {
+        audioNode.disconnect(this.audible);
     }
     /* eslint-enable no-bitwise */
 }

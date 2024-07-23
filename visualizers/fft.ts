@@ -1,5 +1,13 @@
 export default class FFT {
-    constructor(samplesIn, samplesOut, equalize = false) {
+    samplesIn: number;
+    samplesOut: number;
+    equalize: boolean;
+    NFREQ: number;
+    equalizeArr: Float32Array | null = null;
+    bitrevtable: Uint16Array;
+    cossintable: Float32Array[];
+
+    constructor(samplesIn: number, samplesOut: number, equalize = false) {
         this.samplesIn = samplesIn;
         this.samplesOut = samplesOut;
         this.equalize = equalize;
@@ -8,6 +16,8 @@ export default class FFT {
         if (this.equalize) {
             this.initEqualizeTable();
         }
+        this.bitrevtable = new Uint16Array(this.NFREQ);
+        this.cossintable = [new Float32Array(0), new Float32Array(0)];
         this.initBitRevTable();
         this.initCosSinTable();
     }
@@ -23,8 +33,6 @@ export default class FFT {
 
     /* eslint-disable no-bitwise */
     initBitRevTable() {
-        this.bitrevtable = new Uint16Array(this.NFREQ);
-
         for (let i = 0; i < this.NFREQ; i++) {
             this.bitrevtable[i] = i;
         }
@@ -72,7 +80,7 @@ export default class FFT {
         }
     }
 
-    timeToFrequencyDomain(waveDataIn) {
+    timeToFrequencyDomain(waveDataIn: Int8Array) {
         const real = new Float32Array(this.NFREQ);
         const imag = new Float32Array(this.NFREQ);
 
@@ -116,7 +124,7 @@ export default class FFT {
         }
 
         const spectralDataOut = new Float32Array(this.samplesOut);
-        if (this.equalize) {
+        if (this.equalize && this.equalizeArr != null) {
             for (let i = 0; i < this.samplesOut; i++) {
                 spectralDataOut[i] =
                     this.equalizeArr[i] *

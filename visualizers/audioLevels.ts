@@ -1,5 +1,16 @@
+import AudioProcessor from './audioProcessor';
+
 export default class AudioLevels {
-    constructor(audio) {
+    audio: AudioProcessor;
+    starts: [number, number, number];
+    stops: [number, number, number];
+    val: Float32Array;
+    imm: Float32Array;
+    att: Float32Array;
+    avg: Float32Array;
+    longAvg: Float32Array;
+
+    constructor(audio: AudioProcessor) {
         this.audio = audio;
 
         let sampleRate;
@@ -72,7 +83,7 @@ export default class AudioLevels {
     }
     /* eslint-enable camelcase */
 
-    static isFiniteNumber(num) {
+    static isFiniteNumber(num: number) {
         return Number.isFinite(num) && !Number.isNaN(num);
     }
 
