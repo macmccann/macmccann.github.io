@@ -1,0 +1,72 @@
+:root {
+    --primary-color: #abffca;
+    --secondary-color: #000000;
+    --tertiary-color: #232323;
+    --text-color: #ffffff;
+}
+
+[data-theme='foam'] {
+    --primary-color: #abffca;
+    --secondary-color: #000000;
+    --tertiary-color: #232323;
+    --text-color: #ffffff;
+}
+
+[data-theme='fire'] {
+    --primary-color: #ff0000;
+    --secondary-color: #000000;
+    --tertiary-color: #232323;
+    --text-color: #ffffff;
+}
+
+[data-theme='bubblegum'] {
+    --primary-color: #ffffff;
+    --secondary-color: #ffd1f2;
+    --tertiary-color: #fff3ff;
+    --text-color: #c783c7;
+}
+
+[data-theme='galaxy'] {
+    --primary-color: #e8daed;
+    --secondary-color: #2a313e;
+    --tertiary-color: #5b616d;
+    --text-color: #e8daed;
+}
+
+body {
+    margin: 0;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+canvas {
+    display: block;
+    margin: 0 auto;
+}
+
+select {
+    background-color: var(--tertiary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 5px;
+    margin: 10px;
+    -webkit-appearance: none;
+}
+
+*:focus {
+    outline: none;
+}
+
+input[type='file'] {
+    display: none;
+}
+
+.custom-file-upload {
+    background-color: var(--tertiary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 5px;
+    margin: 10px;
+    font-family: 'Arial';
+    font-size: 0.8rem;
+}

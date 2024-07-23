@@ -28,7 +28,7 @@ export const RENDER_FUNCS = {
         for (let i = 0; i < numBars; i++) {
             const logWidth = (logWidths[i] / totalLog) * canvasWidth;
 
-            const barHeight = data[i] * canvasHeight / 20;
+            const barHeight = (data[i] * canvasHeight) / 20;
             ctx.fillStyle = ColorThemes.getTheme().primary;
             ctx.fillRect(
                 cumulativeWidth,
@@ -40,10 +40,13 @@ export const RENDER_FUNCS = {
         }
     },
     line: (audio, canvas, ctx) => {
-        const data = audio.freqArrayL;
+        const data = audio.freqArray.map((val) => {
+            return Math.log10(val + 1);
+        });
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const numBars = data.length;
+
 
         // Clear the canvas
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -69,7 +72,7 @@ export const RENDER_FUNCS = {
             const logWidth = (logWidths[i] / totalLog) * canvasWidth;
 
             const x = cumulativeWidth + logWidth / 2;
-            const y = canvasHeight - (data[i] * canvasHeight) / 20;
+            const y = canvasHeight - (data[i] * canvasHeight) / 2;
 
             if (i === 0) {
                 ctx.moveTo(x, y);
