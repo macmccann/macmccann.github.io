@@ -3,6 +3,8 @@ import AudioProcessor from './audioProcessor.js';
 import { RENDER_FUNCS } from './renderFuncs.js';
 import Options from './options.js';
 
+export type VisualizerMode = 'line' | 'bars';
+
 export default class Visualizer {
     audio: AudioProcessor;
     audioLevels: AudioLevels;

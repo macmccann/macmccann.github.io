@@ -1,8 +1,13 @@
-import ColorThemes from './colorThemes.js';
+import AudioProcessor from './audioProcessor';
+import ColorThemes from './colorThemes';
 
 export const RENDER_FUNCS = {
-    bars: (audio, canvas, ctx) => {
-        const data = audio.freqArrayL;
+    bars: (
+        audio: AudioProcessor,
+        canvas: HTMLCanvasElement,
+        ctx: CanvasRenderingContext2D
+    ) => {
+        const data = audio.freqArray;
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const numBars = data.length;
@@ -29,6 +34,7 @@ export const RENDER_FUNCS = {
             const logWidth = (logWidths[i] / totalLog) * canvasWidth;
 
             const barHeight = (data[i] * canvasHeight) / 20;
+            const something = ColorThemes.getTheme();
             ctx.fillStyle = ColorThemes.getTheme().primary;
             ctx.fillRect(
                 cumulativeWidth,
@@ -39,14 +45,17 @@ export const RENDER_FUNCS = {
             cumulativeWidth += logWidth;
         }
     },
-    line: (audio, canvas, ctx) => {
+    line: (
+        audio: AudioProcessor,
+        canvas: HTMLCanvasElement,
+        ctx: CanvasRenderingContext2D
+    ) => {
         const data = audio.freqArray.map((val) => {
             return Math.log10(val + 1);
         });
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const numBars = data.length;
-
 
         // Clear the canvas
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);

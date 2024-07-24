@@ -1,0 +1,66 @@
+:root, [data-theme="foam"] {
+  --primary-color: #abffca;
+  --secondary-color: #000;
+  --tertiary-color: #232323;
+  --text-color: #fff;
+}
+
+[data-theme="fire"] {
+  --primary-color: red;
+  --secondary-color: #000;
+  --tertiary-color: #232323;
+  --text-color: #fff;
+}
+
+[data-theme="bubblegum"] {
+  --primary-color: #fff;
+  --secondary-color: #ffd1f2;
+  --tertiary-color: #fff3ff;
+  --text-color: #c783c7;
+}
+
+[data-theme="galaxy"] {
+  --primary-color: #e8daed;
+  --secondary-color: #2a313e;
+  --tertiary-color: #5b616d;
+  --text-color: #e8daed;
+}
+
+body {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  margin: 0;
+}
+
+canvas {
+  margin: 0 auto;
+  display: block;
+}
+
+select {
+  background-color: var(--tertiary-color);
+  color: var(--text-color);
+  -webkit-appearance: none;
+  border: none;
+  margin: 10px;
+  padding: 5px;
+}
+
+:focus {
+  outline: none;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  background-color: var(--tertiary-color);
+  color: var(--text-color);
+  border: none;
+  margin: 10px;
+  padding: 5px;
+  font-family: Arial;
+  font-size: .8rem;
+}
+/*# sourceMappingURL=index.9e4c6fd2.css.map */
