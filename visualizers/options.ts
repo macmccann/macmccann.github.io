@@ -2,16 +2,24 @@ import { ColorThemeName } from './colorThemes';
 import { colorThemeSelect, modeSelect } from './documentElements';
 import { VisualizerMode } from './visualizer';
 
-type OptionName = 'theme' | 'visualizer';
+type OptionName =
+    | 'theme'
+    | 'visualizer'
+    | 'attenuationRateDown'
+    | 'attenuationRateUp';
 
 type TOptions = {
     theme: ColorThemeName;
     visualizer: VisualizerMode;
+    attenuationRateDown: string;
+    attenuationRateUp: string;
 };
 
 const opts: TOptions = {
     theme: 'foam',
     visualizer: 'line',
+    attenuationRateDown: '0.2',
+    attenuationRateUp: '0.8',
 };
 
 export default class Options {
@@ -31,18 +39,18 @@ export default class Options {
 
     static setOption<T extends keyof TOptions>(key: T, value: TOptions[T]) {
         opts[key] = value;
-        localStorage.setItem(key, value);
+        localStorage.setItem(key, value.toString());
         Options.sideEffects(key);
     }
 
-    static sideEffects = (key: OptionName) => {
+    static sideEffects<T extends keyof TOptions>(key: T): void {
         if (key === 'theme') {
             Options.setThemeSideEffect(opts.theme);
         }
         if (key === 'visualizer') {
             Options.setVisualizerSideEffect(opts.visualizer);
         }
-    };
+    }
 
     static setThemeSideEffect = (newTheme: ColorThemeName) => {
         document.documentElement.setAttribute('data-theme', newTheme);

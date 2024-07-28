@@ -697,13 +697,14 @@ var _audioProcessorJsDefault = parcelHelpers.interopDefault(_audioProcessorJs);
 var _renderFuncsJs = require("./renderFuncs.js");
 var _optionsJs = require("./options.js");
 var _optionsJsDefault = parcelHelpers.interopDefault(_optionsJs);
+var _documentElementsJs = require("./documentElements.js");
 class Visualizer {
     constructor(audioContext){
         this.audioNode = null;
         this.audio = new (0, _audioProcessorJsDefault.default)(audioContext);
         this.audioLevels = new (0, _audioLevelsJsDefault.default)(this.audio);
         // Get the canvas element and its context
-        this.canvas = document.getElementById("volumeBarCanvas");
+        this.canvas = (0, _documentElementsJs.volumeBarCanvas);
         this.ctx = this.canvas.getContext("2d");
     }
     render() {
@@ -723,14 +724,16 @@ class Visualizer {
         // Clear the canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         const renderFunc = (0, _renderFuncsJs.RENDER_FUNCS)[(0, _optionsJsDefault.default).getOption("visualizer")];
-        renderFunc(this.audio, this.canvas, this.ctx);
+        renderFunc(this.audio.freqArrayAvg, this.canvas, this.ctx);
     }
 }
 exports.default = Visualizer;
 
-},{"./audioLevels.js":"9Goj8","./audioProcessor.js":"c2Ffz","./renderFuncs.js":"gUb6E","./options.js":"kHa67","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9Goj8":[function(require,module,exports) {
+},{"./audioLevels.js":"9Goj8","./audioProcessor.js":"c2Ffz","./renderFuncs.js":"gUb6E","./options.js":"kHa67","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./documentElements.js":"jgzJc"}],"9Goj8":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+var _average = require("./average");
+var _averageDefault = parcelHelpers.interopDefault(_average);
 class AudioLevels {
     constructor(audio){
         this.audio = audio;
@@ -799,37 +802,57 @@ class AudioLevels {
             // Clear for next loop
             this.imm.fill(0);
             for(let i = 0; i < 3; i++)for(let j = this.starts[i]; j < this.stops[i]; j++)this.imm[i] += this.audio.freqArray[j];
-            for(let i = 0; i < 3; i++){
-                let rate;
-                if (this.imm[i] > this.avg[i]) rate = 0.2;
-                else rate = 0.5;
-                // rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
-                this.avg[i] = this.avg[i] * rate + this.imm[i] * (1 - rate);
-                // if (frame < 50) {
-                //     rate = 0.9;
-                // } else {
-                rate = 0.992;
-                // }
-                // rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
-                this.longAvg[i] = this.longAvg[i] * rate + this.imm[i] * (1 - rate);
-                if (this.longAvg[i] < 0.001) {
-                    this.val[i] = 1.0;
-                    this.att[i] = 1.0;
-                } else {
-                    this.val[i] = this.imm[i] / this.longAvg[i];
-                    this.att[i] = this.avg[i] / this.longAvg[i];
-                }
+            //     // rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
+            this.avg = (0, _averageDefault.default).average(this.avg, this.imm, {
+                rateUp: 0.8,
+                rateDown: 0.5
+            });
+            // if (frame < 50) {
+            //     longAvgRate = 0.9;
+            // } else {
+            // }
+            // longAvgRate = AudioLevels.adjustRateToFPS(longAvgRate, 30.0, effectiveFPS);
+            const longAvgRate = 0.992;
+            this.longAvg = (0, _averageDefault.default).average(this.longAvg, this.imm, {
+                rateUp: longAvgRate,
+                rateDown: longAvgRate
+            });
+            for(let i = 0; i < 3; i++)if (this.longAvg[i] < 0.001) {
+                this.val[i] = 1.0;
+                this.att[i] = 1.0;
+            } else {
+                this.val[i] = this.imm[i] / this.longAvg[i];
+                this.att[i] = this.avg[i] / this.longAvg[i];
             }
         }
     }
 }
 exports.default = AudioLevels;
 
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./average":"9HyV3"}],"9HyV3":[function(require,module,exports) {
+// Higher rates make the average follow the immediate value more closely.
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+class Average {
+    static average(avgArray, immArray, { rateUp, rateDown }) {
+        console.assert(avgArray.length === immArray.length);
+        const result = new Float32Array(avgArray.length);
+        for(let i = 0; i < avgArray.length; i++)if (avgArray[i] > immArray[i]) result[i] = avgArray[i] * (1 - rateUp) + immArray[i] * rateUp;
+        else result[i] = avgArray[i] * (1 - rateDown) + immArray[i] * rateDown;
+        return result;
+    }
+}
+exports.default = Average;
+
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"c2Ffz":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+var _averageJs = require("./average.js");
+var _averageJsDefault = parcelHelpers.interopDefault(_averageJs);
 var _fftJs = require("./fft.js");
 var _fftJsDefault = parcelHelpers.interopDefault(_fftJs);
+var _optionsJs = require("./options.js");
+var _optionsJsDefault = parcelHelpers.interopDefault(_optionsJs);
 class AudioProcessor {
     constructor(context){
         this.numSamps = 512;
@@ -869,6 +892,7 @@ class AudioProcessor {
         this.timeArrayR = new Int8Array(this.numSamps);
         // Frequency domain arrays
         this.freqArray = new Float32Array(0);
+        this.freqArrayAvg = new Float32Array(0);
         this.freqArrayL = new Float32Array(0);
         this.freqArrayR = new Float32Array(0);
     }
@@ -902,6 +926,11 @@ class AudioProcessor {
         }
         // Use full width samples for the FFT
         this.freqArray = this.fft.timeToFrequencyDomain(this.timeArray);
+        if (this.freqArrayAvg.length === 0) this.freqArrayAvg = this.freqArray;
+        this.freqArrayAvg = (0, _averageJsDefault.default).average(this.freqArrayAvg, this.freqArray, {
+            rateDown: Number.parseFloat((0, _optionsJsDefault.default).getOption("attenuationRateDown")),
+            rateUp: Number.parseFloat((0, _optionsJsDefault.default).getOption("attenuationRateUp"))
+        });
         this.freqArrayL = this.fft.timeToFrequencyDomain(this.timeByteArraySignedL);
         this.freqArrayR = this.fft.timeToFrequencyDomain(this.timeByteArraySignedR);
     }
@@ -914,7 +943,7 @@ class AudioProcessor {
 }
 exports.default = AudioProcessor;
 
-},{"./fft.js":"8S9Sq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8S9Sq":[function(require,module,exports) {
+},{"./fft.js":"8S9Sq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./average.js":"9HyV3","./options.js":"kHa67"}],"8S9Sq":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 class FFT {
@@ -1018,15 +1047,61 @@ class FFT {
 }
 exports.default = FFT;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gUb6E":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kHa67":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _documentElements = require("./documentElements");
+const opts = {
+    theme: "foam",
+    visualizer: "line",
+    attenuationRateDown: "0.2",
+    attenuationRateUp: "0.8"
+};
+class Options {
+    static init() {
+        for(const key in opts)if (localStorage.getItem(key) != null) {
+            // @ts-ignore - TODO: write error handling for local storage keys
+            opts[key] = localStorage.getItem(key);
+            Options.sideEffects(key);
+        }
+    }
+    static getOption(key) {
+        return opts[key];
+    }
+    static setOption(key, value) {
+        opts[key] = value;
+        localStorage.setItem(key, value.toString());
+        Options.sideEffects(key);
+    }
+    static sideEffects(key) {
+        if (key === "theme") Options.setThemeSideEffect(opts.theme);
+        if (key === "visualizer") Options.setVisualizerSideEffect(opts.visualizer);
+    }
+    static{
+        this.setThemeSideEffect = (newTheme)=>{
+            document.documentElement.setAttribute("data-theme", newTheme);
+            (0, _documentElements.colorThemeSelect).value = newTheme;
+        };
+    }
+    static{
+        this.setVisualizerSideEffect = (newVisualizer)=>{
+            (0, _documentElements.modeSelect).value = newVisualizer;
+        };
+    }
+}
+exports.default = Options;
+(()=>{
+    Options.init();
+})();
+
+},{"./documentElements":"jgzJc","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gUb6E":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "RENDER_FUNCS", ()=>RENDER_FUNCS);
 var _colorThemes = require("./colorThemes");
 var _colorThemesDefault = parcelHelpers.interopDefault(_colorThemes);
 const RENDER_FUNCS = {
-    bars: (audio, canvas, ctx)=>{
-        const data = audio.freqArray;
+    bars: (data, canvas, ctx)=>{
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const numBars = data.length;
@@ -1052,13 +1127,13 @@ const RENDER_FUNCS = {
             cumulativeWidth += logWidth;
         }
     },
-    line: (audio, canvas, ctx)=>{
-        const data = audio.freqArray.map((val)=>{
+    line: (data, canvas, ctx)=>{
+        const logNormalizedData = data.map((val)=>{
             return Math.log10(val + 1);
         });
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const numBars = data.length;
+        const numBars = logNormalizedData.length;
         // Clear the canvas
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         // Calculate logarithmic positions for each bar
@@ -1077,7 +1152,7 @@ const RENDER_FUNCS = {
         for(let i = 0; i < numBars; i++){
             const logWidth = logWidths[i] / totalLog * canvasWidth;
             const x = cumulativeWidth + logWidth / 2;
-            const y = canvasHeight - data[i] * canvasHeight / 2;
+            const y = canvasHeight - logNormalizedData[i] * canvasHeight;
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
             cumulativeWidth += logWidth;
@@ -1122,53 +1197,6 @@ class ColorThemes {
 }
 exports.default = ColorThemes;
 
-},{"./options.js":"kHa67","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kHa67":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _documentElements = require("./documentElements");
-const opts = {
-    theme: "foam",
-    visualizer: "line"
-};
-class Options {
-    static init() {
-        for(const key in opts)if (localStorage.getItem(key) != null) {
-            // @ts-ignore - TODO: write error handling for local storage keys
-            opts[key] = localStorage.getItem(key);
-            Options.sideEffects(key);
-        }
-    }
-    static getOption(key) {
-        return opts[key];
-    }
-    static setOption(key, value) {
-        opts[key] = value;
-        localStorage.setItem(key, value);
-        Options.sideEffects(key);
-    }
-    static{
-        this.sideEffects = (key)=>{
-            if (key === "theme") Options.setThemeSideEffect(opts.theme);
-            if (key === "visualizer") Options.setVisualizerSideEffect(opts.visualizer);
-        };
-    }
-    static{
-        this.setThemeSideEffect = (newTheme)=>{
-            document.documentElement.setAttribute("data-theme", newTheme);
-            (0, _documentElements.colorThemeSelect).value = newTheme;
-        };
-    }
-    static{
-        this.setVisualizerSideEffect = (newVisualizer)=>{
-            (0, _documentElements.modeSelect).value = newVisualizer;
-        };
-    }
-}
-exports.default = Options;
-(()=>{
-    Options.init();
-})();
-
-},{"./documentElements":"jgzJc","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["7LIoy","7ZSs6"], "7ZSs6", "parcelRequire599b")
+},{"./options.js":"kHa67","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["7LIoy","7ZSs6"], "7ZSs6", "parcelRequire599b")
 
 //# sourceMappingURL=index.bcfa8452.js.map

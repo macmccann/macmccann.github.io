@@ -2,6 +2,7 @@ import AudioLevels from './audioLevels.js';
 import AudioProcessor from './audioProcessor.js';
 import { RENDER_FUNCS } from './renderFuncs.js';
 import Options from './options.js';
+import { volumeBarCanvas } from './documentElements.js';
 
 export type VisualizerMode = 'line' | 'bars';
 
@@ -17,9 +18,7 @@ export default class Visualizer {
         this.audioLevels = new AudioLevels(this.audio);
 
         // Get the canvas element and its context
-        this.canvas = document.getElementById(
-            'volumeBarCanvas'
-        ) as HTMLCanvasElement;
+        this.canvas = volumeBarCanvas;
         this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
     }
 
@@ -44,6 +43,6 @@ export default class Visualizer {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         const renderFunc = RENDER_FUNCS[Options.getOption('visualizer')];
-        renderFunc(this.audio, this.canvas, this.ctx);
+        renderFunc(this.audio.freqArrayAvg, this.canvas, this.ctx);
     }
 }

@@ -1,13 +1,11 @@
-import AudioProcessor from './audioProcessor';
 import ColorThemes from './colorThemes';
 
 export const RENDER_FUNCS = {
     bars: (
-        audio: AudioProcessor,
+        data: Float32Array,
         canvas: HTMLCanvasElement,
         ctx: CanvasRenderingContext2D
     ) => {
-        const data = audio.freqArray;
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const numBars = data.length;
@@ -46,16 +44,16 @@ export const RENDER_FUNCS = {
         }
     },
     line: (
-        audio: AudioProcessor,
+        data: Float32Array,
         canvas: HTMLCanvasElement,
         ctx: CanvasRenderingContext2D
     ) => {
-        const data = audio.freqArray.map((val) => {
+        const logNormalizedData = data.map((val) => {
             return Math.log10(val + 1);
         });
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const numBars = data.length;
+        const numBars = logNormalizedData.length;
 
         // Clear the canvas
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -81,7 +79,7 @@ export const RENDER_FUNCS = {
             const logWidth = (logWidths[i] / totalLog) * canvasWidth;
 
             const x = cumulativeWidth + logWidth / 2;
-            const y = canvasHeight - (data[i] * canvasHeight) / 2;
+            const y = canvasHeight - (logNormalizedData[i] * canvasHeight);
 
             if (i === 0) {
                 ctx.moveTo(x, y);

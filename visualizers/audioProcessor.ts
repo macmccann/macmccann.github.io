@@ -1,4 +1,6 @@
+import Average from './average.js';
 import FFT from './fft.js';
+import Options from './options.js';
 
 export default class AudioProcessor {
     numSamps: number;
@@ -21,6 +23,7 @@ export default class AudioProcessor {
     timeArrayL: Int8Array;
     timeArrayR: Int8Array;
     freqArray: Float32Array;
+    freqArrayAvg: Float32Array;
     freqArrayL: Float32Array;
     freqArrayR: Float32Array;
 
@@ -75,6 +78,7 @@ export default class AudioProcessor {
 
         // Frequency domain arrays
         this.freqArray = new Float32Array(0);
+        this.freqArrayAvg = new Float32Array(0);
         this.freqArrayL = new Float32Array(0);
         this.freqArrayR = new Float32Array(0);
     }
@@ -125,6 +129,17 @@ export default class AudioProcessor {
 
         // Use full width samples for the FFT
         this.freqArray = this.fft.timeToFrequencyDomain(this.timeArray);
+
+        if (this.freqArrayAvg.length === 0) {
+            this.freqArrayAvg = this.freqArray;
+        }
+        this.freqArrayAvg = Average.average(this.freqArrayAvg, this.freqArray, {
+            rateDown: Number.parseFloat(
+                Options.getOption('attenuationRateDown')
+            ),
+            rateUp: Number.parseFloat(Options.getOption('attenuationRateUp')),
+        });
+
         this.freqArrayL = this.fft.timeToFrequencyDomain(
             this.timeByteArraySignedL
         );

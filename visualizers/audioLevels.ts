@@ -1,4 +1,5 @@
 import AudioProcessor from './audioProcessor';
+import Average from './average';
 
 export default class AudioLevels {
     audio: AudioProcessor;
@@ -111,25 +112,25 @@ export default class AudioLevels {
                 }
             }
 
+            //     // rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
+            this.avg = Average.average(this.avg, this.imm, {
+                rateUp: 0.8,
+                rateDown: 0.5,
+            });
+
+            // if (frame < 50) {
+            //     longAvgRate = 0.9;
+            // } else {
+            // }
+            // longAvgRate = AudioLevels.adjustRateToFPS(longAvgRate, 30.0, effectiveFPS);
+            const longAvgRate = 0.992;
+
+            this.longAvg = Average.average(this.longAvg, this.imm, {
+                rateUp: longAvgRate,
+                rateDown: longAvgRate,
+            });
+
             for (let i = 0; i < 3; i++) {
-                let rate;
-                if (this.imm[i] > this.avg[i]) {
-                    rate = 0.2;
-                } else {
-                    rate = 0.5;
-                }
-                // rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
-                this.avg[i] = this.avg[i] * rate + this.imm[i] * (1 - rate);
-
-                // if (frame < 50) {
-                //     rate = 0.9;
-                // } else {
-                rate = 0.992;
-                // }
-                // rate = AudioLevels.adjustRateToFPS(rate, 30.0, effectiveFPS);
-                this.longAvg[i] =
-                    this.longAvg[i] * rate + this.imm[i] * (1 - rate);
-
                 if (this.longAvg[i] < 0.001) {
                     this.val[i] = 1.0;
                     this.att[i] = 1.0;
